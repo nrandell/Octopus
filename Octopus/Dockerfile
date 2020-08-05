@@ -2,7 +2,7 @@
 
 WORKDIR /build
 
-COPY ["Directory.Build.props", "GlobalSuppressions.cs", "./"]
+COPY ["Directory.Build.props", "GlobalSuppressions.cs", ".editorconfig", "./"]
 COPY ["Octopus/Octopus.csproj", "Octopus/"]
 WORKDIR /build/Octopus
 RUN dotnet restore
