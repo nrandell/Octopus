@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <Authors>nick@nickrandell.com</Authors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Roslynator.Analyzers" Version="3.0.0-rc" PrivateAssets="All" />
+    <Compile Include="../GlobalSuppressions.cs" />
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.508">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

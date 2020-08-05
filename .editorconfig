@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# MA0004: Use .ConfigureAwait(false)
+dotnet_diagnostic.MA0004.severity = none
+
+# MA0076: Do not use implicit culture-sensitive ToString in interpolated strings
+dotnet_diagnostic.MA0076.severity = none

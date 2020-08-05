@@ -1,0 +1,12 @@
+﻿create retention policy "one_year" on HomeMeasurements duration 52w replication 1
+create retention policy "ten_years" on HomeMeasurements duration 520w replication 1
+
+
+CREATE CONTINUOUS QUERY "cq_daily_pricing" ON HomeMeasurements
+BEGIN
+  select sum(CostExcVat) as CostExcVat, 
+	sum(CostIncVat) as CostIncVat 
+	into "HomeMeasurements"."ten_years"."DailyPrices" 
+	from one_year.Price 
+	group by time(1d)
+END
