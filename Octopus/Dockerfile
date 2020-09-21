@@ -1,4 +1,4 @@
-﻿FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:5.0.100-preview.7 as build
+﻿FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:5.0.100-rc.1 as build
 
 WORKDIR /build
 
@@ -16,7 +16,7 @@ RUN dotnet build -c Release
 FROM build as publish
 RUN dotnet publish -c Release --no-build -o /publish
 
-FROM mcr.microsoft.com/dotnet/runtime:5.0.0-preview.7-buster-slim-arm32v7 as final
+FROM mcr.microsoft.com/dotnet/runtime:5.0.0-rc.1-buster-slim-arm32v7 as final
 WORKDIR /app
 COPY --from=publish /publish .
 

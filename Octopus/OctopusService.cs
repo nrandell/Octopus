@@ -53,19 +53,26 @@ namespace Octopus
 
                 using var responseStream = await response.Content.ReadAsStreamAsync(ct);
                 var octopusResponse = await JsonSerializer.DeserializeAsync<OctopusResponse<T>>(responseStream, SerializerOptions, ct);
-                foreach (var result in octopusResponse.Results)
+                if (octopusResponse != null)
                 {
-                    yield return result;
-                }
+                    foreach (var result in octopusResponse.Results)
+                    {
+                        yield return result;
+                    }
 
-                if (string.IsNullOrWhiteSpace(octopusResponse.Next))
-                {
-                    urlToUse = null;
+                    if (string.IsNullOrWhiteSpace(octopusResponse.Next))
+                    {
+                        urlToUse = null;
+                    }
+                    else
+                    {
+                        var uri = new Uri(octopusResponse.Next);
+                        urlToUse = uri.PathAndQuery;
+                    }
                 }
                 else
                 {
-                    var uri = new Uri(octopusResponse.Next);
-                    urlToUse = uri.PathAndQuery;
+                    urlToUse = null;
                 }
             }
         }
