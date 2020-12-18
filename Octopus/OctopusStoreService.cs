@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Microsoft.Extensions.Logging;
 
 namespace Octopus
 {
@@ -11,11 +12,13 @@ namespace Octopus
     {
         public ILogger Logger { get; }
         public InfluxDbService InfluxDb { get; }
+        public string Bucket { get; }
 
-        public OctopusStoreService(ILogger<OctopusStoreService> logger, InfluxDbService influxDbService)
+        public OctopusStoreService(ILogger<OctopusStoreService> logger, InfluxDbService influxDbService, IOptions<InfluxDbService.Config> influxConfigOptions)
         {
             Logger = logger;
             InfluxDb = influxDbService;
+            Bucket = influxConfigOptions.Value.Bucket;
         }
 
 #pragma warning disable MA0016 // Prefer return collection abstraction instead of implementation
@@ -24,8 +27,8 @@ namespace Octopus
 
         public async Task<OctopusPriceEntry?> ReadLastPriceEntryAsync()
         {
-            const string flux = @"
-from(bucket:""HomeMeasurements/one_year"") 
+            var flux = $@"
+from(bucket:""{Bucket}"") 
 |> range(start: -12mo, stop: 1w)
 |> filter(fn: (r) => (r._measurement == ""Price""))
 |> last()
@@ -40,8 +43,8 @@ from(bucket:""HomeMeasurements/one_year"")
 
         public async Task<OctopusTariffEntry?> ReadLastTariffEntryAsync()
         {
-            const string flux = @"
-from(bucket:""HomeMeasurements/one_year"") 
+            var flux = $@"
+from(bucket:""{Bucket}"") 
 |> range(start: -12mo, stop: 1w)
 |> filter(fn: (r) => (r._measurement == ""Tariff""))
 |> last()
@@ -60,8 +63,8 @@ from(bucket:""HomeMeasurements/one_year"")
 
         public async Task<OctopusConsumptionEntry?> ReadLastConsumptionEntryAsync()
         {
-            const string flux = @"
-from(bucket:""HomeMeasurements/one_year"") 
+            var flux = $@"
+from(bucket:""{Bucket}"") 
 |> range(start: -12mo, stop: 1w)
 |> filter(fn: (r) => (r._measurement == ""Consumption""))
 |> last()

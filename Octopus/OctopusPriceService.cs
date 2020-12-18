@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+using NodaTime;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-using NodaTime;
 
 namespace Octopus
 {
@@ -15,11 +16,13 @@ namespace Octopus
     {
         public ILogger Logger { get; }
         public OctopusStoreService OctopusStoreService { get; }
+        public string Bucket { get; }
 
-        public OctopusPriceService(ILogger<OctopusPriceService> logger, OctopusStoreService octopusStoreService)
+        public OctopusPriceService(ILogger<OctopusPriceService> logger, OctopusStoreService octopusStoreService, IOptions<InfluxDbService.Config> influxConfigOptions)
         {
             Logger = logger;
             OctopusStoreService = octopusStoreService;
+            Bucket = influxConfigOptions.Value.Bucket;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -46,8 +49,8 @@ namespace Octopus
 
             if (latest == null)
             {
-                const string flux = @"
-from(bucket: ""HomeMeasurements/one_year"")
+                var flux = $@"
+from(bucket: ""{Bucket}"")
 |> range(start: -12mo)
 |> filter(fn: (r) => r._measurement == ""Consumption"")
 |> pivot(
@@ -56,13 +59,20 @@ from(bucket: ""HomeMeasurements/one_year"")
     valueColumn: ""_value""
 )";
                 consumptionEntries = await OctopusStoreService.QueryAsync<OctopusConsumptionEntry>(flux);
-                requestTime = consumptionEntries[0].Time.Plus(Duration.FromMinutes(30));
+                if (consumptionEntries.Count == 0)
+                {
+                    requestTime = Instant.FromUtc(2020, 1, 1, 0, 0);
+                }
+                else
+                {
+                    requestTime = consumptionEntries[0].Time.Plus(Duration.FromMinutes(30));
+                }
             }
             else
             {
                 requestTime = latest.Time.Plus(Duration.FromMinutes(30));
-                var flux = @$"
-from(bucket: ""HomeMeasurements/one_year"")
+                var flux = $@"
+from(bucket: ""{Bucket}"")
 |> range(start: {requestTime})
 |> filter(fn: (r) => r._measurement == ""Consumption"")
 |> pivot(
@@ -107,7 +117,7 @@ from(bucket: ""HomeMeasurements/one_year"")
         private async Task<List<OctopusTariffEntry>> QueryTarrifEntries(Instant requestTime)
         {
             var tariffFlux = $@"
-from(bucket:""HomeMeasurements/one_year"") 
+from(bucket:""{Bucket}"") 
 |> range(start: {requestTime})
 |> filter(fn: (r) => (r._measurement == ""Tariff""))
 |> pivot(

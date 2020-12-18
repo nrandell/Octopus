@@ -51,6 +51,7 @@ namespace Octopus
                 .ConfigureServices((context, services) =>
                 {
                     services.Configure<OctopusConfiguration>(context.Configuration.GetSection("Octopus"));
+                    services.Configure<InfluxDbService.Config>(context.Configuration.GetSection("Influx"));
 
                     services.Configure<JsonSerializerOptions>(options =>
                     {

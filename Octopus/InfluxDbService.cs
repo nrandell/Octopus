@@ -1,35 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-using InfluxDB.Client;
+﻿using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Core.Exceptions;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Polly.Retry;
 
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Octopus
 {
     public class InfluxDbService : IDisposable
     {
+        public class Config
+        {
+            public string Token { get; init; } = default!;
+            public string Bucket { get; init; } = default!;
+            public string Organisation { get; init; } = default!;
+            public string Url { get; init; } = default!;
+        }
+
         public ILogger Logger { get; }
         public AsyncRetryPolicy RetryPolicy { get; }
 
-        private const string DatabaseName = "HomeMeasurements";
         private readonly InfluxDBClient _client;
 
-        public InfluxDbService(ILogger<InfluxDbService> logger)
+        public InfluxDbService(ILogger<InfluxDbService> logger, IOptions<Config> configOptions)
         {
             Logger = logger;
+            var config = configOptions.Value;
             var options = InfluxDBClientOptions.Builder.CreateNew()
-                .Url("http://server.home:8086")
-                .Bucket(DatabaseName + "/one_year")
-                .Org("-")
+                .Url(config.Url)
+                .Bucket(config.Bucket)
+                .Org(config.Organisation)
+                .AuthenticateToken(config.Token)
                 .Build();
 
             _client = InfluxDBClientFactory.Create(options);
@@ -40,7 +50,11 @@ namespace Octopus
                     (ex, ts) => Logger.LogWarning(ex, "Waiting {TimeSpan} due to {Exception}", ts, ex.Message));
         }
 
-        public void Dispose() => _client.Dispose();
+        public void Dispose()
+        {
+            _client.Dispose();
+            GC.SuppressFinalize(this);
+        }
 
         private Task WriteAsync<T>(List<T> entries, CancellationToken ct) =>
             RetryPolicy.ExecuteAsync(_ => _client.GetWriteApiAsync().WriteMeasurementsAsync(WritePrecision.S, entries), ct);
