@@ -45,7 +45,7 @@ namespace Octopus
         private async Task ProcessNewerValues(OctopusPriceEntry? latest, CancellationToken ct)
         {
             Instant requestTime;
-            List<OctopusConsumptionEntry> consumptionEntries;
+            IReadOnlyList<OctopusConsumptionEntry> consumptionEntries;
 
             if (latest == null)
             {
@@ -97,7 +97,7 @@ from(bucket: ""{Bucket}"")
             }
         }
 
-        private static List<OctopusPriceEntry> JoinConsumptionAndTariff(List<OctopusConsumptionEntry> consumptionEntries, List<OctopusTariffEntry> tariffEntries)
+        private static List<OctopusPriceEntry> JoinConsumptionAndTariff(IReadOnlyList<OctopusConsumptionEntry> consumptionEntries, IReadOnlyList<OctopusTariffEntry> tariffEntries)
         {
             return consumptionEntries.Join(tariffEntries, oce => oce.Time, ope => ope.Time,
                 (oce, ope) =>
@@ -114,7 +114,7 @@ from(bucket: ""{Bucket}"")
                 .ToList();
         }
 
-        private async Task<List<OctopusTariffEntry>> QueryTarrifEntries(Instant requestTime)
+        private async Task<IReadOnlyList<OctopusTariffEntry>> QueryTarrifEntries(Instant requestTime)
         {
             var tariffFlux = $@"
 from(bucket:""{Bucket}"") 

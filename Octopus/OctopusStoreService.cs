@@ -21,9 +21,7 @@ namespace Octopus
             Bucket = influxConfigOptions.Value.Bucket;
         }
 
-#pragma warning disable MA0016 // Prefer return collection abstraction instead of implementation
-        public Task<List<T>> QueryAsync<T>(string flux) => InfluxDb.QueryAsync<T>(flux);
-#pragma warning restore MA0016 // Prefer return collection abstraction instead of implementation
+        public Task<IReadOnlyList<T>> QueryAsync<T>(string flux) => InfluxDb.QueryAsync<T>(flux);
 
         public async Task<OctopusPriceEntry?> ReadLastPriceEntryAsync()
         {
@@ -31,12 +29,9 @@ namespace Octopus
 from(bucket:""{Bucket}"") 
 |> range(start: -12mo, stop: 1w)
 |> filter(fn: (r) => (r._measurement == ""Price""))
+|> sort(columns:[""_time""])
 |> last()
-|> pivot(
-    rowKey:[""_time""],
-    columnKey: [""_field""],
-    valueColumn: ""_value""
-)";
+|> pivot(rowKey:[""_time""], columnKey: [""_field""], valueColumn: ""_value"")";
             var results = await InfluxDb.QueryAsync<OctopusPriceEntry>(flux);
             return results.SingleOrDefault();
         }
@@ -47,12 +42,9 @@ from(bucket:""{Bucket}"")
 from(bucket:""{Bucket}"") 
 |> range(start: -12mo, stop: 1w)
 |> filter(fn: (r) => (r._measurement == ""Tariff""))
+|> sort(columns:[""_time""])
 |> last()
-|> pivot(
-    rowKey:[""_time""],
-    columnKey: [""_field""],
-    valueColumn: ""_value""
-)";
+|> pivot(rowKey:[""_time""], columnKey: [""_field""], valueColumn: ""_value"")";
 
             var results = await InfluxDb.QueryAsync<OctopusTariffEntry>(flux);
             return results.SingleOrDefault();
@@ -67,12 +59,9 @@ from(bucket:""{Bucket}"")
 from(bucket:""{Bucket}"") 
 |> range(start: -12mo, stop: 1w)
 |> filter(fn: (r) => (r._measurement == ""Consumption""))
+|> sort(columns:[""_time""])
 |> last()
-|> pivot(
-    rowKey:[""_time""],
-    columnKey: [""_field""],
-    valueColumn: ""_value""
-)";
+|> pivot(rowKey:[""_time""], columnKey: [""_field""], valueColumn: ""_value"")";
             var results = await InfluxDb.QueryAsync<OctopusConsumptionEntry>(flux);
             return results.SingleOrDefault();
         }

@@ -1,8 +1,8 @@
-﻿using System.Text.Json.Serialization;
-
-using InfluxDB.Client.Core;
+﻿using InfluxDB.Client.Core;
 
 using NodaTime;
+
+using System.Text.Json.Serialization;
 
 namespace Octopus
 {
@@ -23,7 +23,7 @@ namespace Octopus
         [JsonPropertyName("valid_to")]
         public Instant ValidTo { get; set; }
 
-        [Column("_time", IsTimestamp = true)]
+        [Column("time", IsTimestamp = true)]
         public Instant Time { get => ValidFrom; set => ValidFrom = value; }
 
         public override string ToString() => $"{Time} = {ValueIncVat}p/kWh ({ValueExcVat}p/kWh)";

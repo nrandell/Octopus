@@ -78,12 +78,10 @@ namespace Octopus
             }
         }
 
-#pragma warning disable MA0016 // Prefer return collection abstraction instead of implementation
-        public Task<List<T>> QueryAsync<T>(string query)
-#pragma warning restore MA0016 // Prefer return collection abstraction instead of implementation
+        public async Task<IReadOnlyList<T>> QueryAsync<T>(string query)
         {
             var queryApi = _client.GetQueryApi();
-            return queryApi.QueryAsync<T>(query);
+            return await queryApi.QueryAsync<T>(query);
         }
     }
 }
