@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Dockerfile" />
+    <Compile Include="MqttProcessing.fs" />
+    <Compile Include="Tariffs.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup />
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Control.AsyncSeq" Version="3.0.3" />
+    <PackageReference Include="InfluxDB.Client" Version="1.14.0" />
+    <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="3.0.13" />
+    <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Nick.Energy.Models.CS\Nick.Energy.Models.CS.csproj" />
+    <ProjectReference Include="..\Nick.Energy.Models\Nick.Energy.Models.fsproj" />
+  </ItemGroup>
+
+</Project>

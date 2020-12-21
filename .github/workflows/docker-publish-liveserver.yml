@@ -1,4 +1,4 @@
-name: Docker
+name: Live Server Docker
 
 on:
   push:
@@ -15,7 +15,7 @@ on:
 
 env:
   # TODO: Change variable to your image's name.
-  IMAGE_NAME: octopus
+  IMAGE_NAME: liveserver
 
 jobs:
   # Run tests.
@@ -51,7 +51,7 @@ jobs:
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --cache-to "type=local,dest=/tmp/.buildx-cache" \
             --platform linux/arm/v7 \
-            --file Octopus/Dockerfile \
+            --file LiveServer/Dockerfile \
             --output "type=image,push=false" .
 
   # Push image to GitHub Packages.
@@ -115,6 +115,6 @@ jobs:
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --cache-to "type=local,dest=/tmp/.buildx-cache" \
             --platform linux/arm/v7 \
-            --file Octopus/Dockerfile \
+            --file LiveServer/Dockerfile \
             --tag $IMAGE_ID:$VERSION \
             --output "type=image,push=true" .

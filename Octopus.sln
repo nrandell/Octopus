@@ -10,12 +10,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.dockerignore = .dockerignore
 		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
-		.github\workflows\docker-publish.yml = .github\workflows\docker-publish.yml
+		.github\workflows\docker-publish-liveserver.yml = .github\workflows\docker-publish-liveserver.yml
+		.github\workflows\docker-publish-octopus.yml = .github\workflows\docker-publish-octopus.yml
 		global.json = global.json
-		GlobalSuppressions.cs = GlobalSuppressions.cs
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Nick.Energy.Models", "Nick.Energy.Models\Nick.Energy.Models.fsproj", "{113B32F3-0973-465C-B361-D0FE1A25E2C7}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Nick.Energy.Models", "Nick.Energy.Models\Nick.Energy.Models.fsproj", "{113B32F3-0973-465C-B361-D0FE1A25E2C7}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "LiveServer", "LiveServer\LiveServer.fsproj", "{928C0D3B-024C-4E85-9282-453E7FE64CC2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nick.Energy.Models.CS", "..\Nick.Energy.Models.CS\Nick.Energy.Models.CS.csproj", "{5F0562D2-6C79-45FA-A2D3-1FCC8A332B93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +35,14 @@ Global
 		{113B32F3-0973-465C-B361-D0FE1A25E2C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{113B32F3-0973-465C-B361-D0FE1A25E2C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{113B32F3-0973-465C-B361-D0FE1A25E2C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{928C0D3B-024C-4E85-9282-453E7FE64CC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{928C0D3B-024C-4E85-9282-453E7FE64CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{928C0D3B-024C-4E85-9282-453E7FE64CC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{928C0D3B-024C-4E85-9282-453E7FE64CC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F0562D2-6C79-45FA-A2D3-1FCC8A332B93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F0562D2-6C79-45FA-A2D3-1FCC8A332B93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F0562D2-6C79-45FA-A2D3-1FCC8A332B93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F0562D2-6C79-45FA-A2D3-1FCC8A332B93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

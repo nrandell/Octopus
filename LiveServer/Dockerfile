@@ -4,14 +4,16 @@ WORKDIR /build
 
 COPY ["Directory.Build.props", "GlobalSuppressions.cs", "global.json", ".editorconfig", "./"]
 COPY ["Nick.Energy.Models.CS/Nick.Energy.Models.CS.csproj", "Nick.Energy.Models.CS/"]
-COPY ["Octopus/Octopus.csproj", "Octopus/"]
-WORKDIR /build/Octopus
+COPY ["Nick.Energy.Models/Nick.Energy.Models.fsproj", "Nick.Energy.Models/"]
+COPY ["LiveServer/LiveServer.fsproj", "LiveServer/"]
+WORKDIR /build/LiveServer
 RUN dotnet restore
 
 WORKDIR /build
 COPY ["Nick.Energy.Models.CS/", "Nick.Energy.Models.CS/"]
-COPY ["Octopus/", "Octopus/"]
-WORKDIR /build/Octopus
+COPY ["Nick.Energy.Models/", "Nick.Energy.Models/"]
+COPY ["LiveServer/", "LiveServer/"]
+WORKDIR /build/LiveServer
 
 RUN dotnet build -c Release
 
@@ -22,4 +24,4 @@ FROM mcr.microsoft.com/dotnet/runtime:5.0.1 as final
 WORKDIR /app
 COPY --from=publish /publish .
 
-ENTRYPOINT ["dotnet", "Octopus.dll"]
+ENTRYPOINT ["dotnet", "LiveServer.dll"]
