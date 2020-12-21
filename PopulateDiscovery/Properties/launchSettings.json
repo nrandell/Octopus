@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PopulateDiscovery": {
+      "commandName": "Project",
+      "commandLineArgs": "server.home ..\\..\\..\\..\\LiveServer\\discovery.json"
+    }
+  }
+}

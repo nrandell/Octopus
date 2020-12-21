@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="discovery.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FSharp.Control.AsyncSeq" Version="3.0.3" />
     <PackageReference Include="InfluxDB.Client" Version="1.14.0" />
     <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="3.0.13" />

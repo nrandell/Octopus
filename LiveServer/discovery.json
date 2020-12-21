@@ -1,0 +1,42 @@
+﻿{
+  "sensor/liveenergy_oakridge/todayCost": {
+    "device": {
+      "identifiers": [ "liveenergy_oakridge" ],
+      "manufacturer": "Nick Randell",
+      "model": "Live energy usage"
+    },
+    "icon": "mdi:money",
+    "unique_id": "Live_Energy_Today_Cost",
+    "name": "Energy Today Cost",
+    "state_topic": "nick/sensor/energy/state",
+    "unit_of_measurement": "p",
+    "value_template": "{{ value_json.todayCost }}"
+  },
+  "sensor/liveenergy_oakridge/lastCost": {
+    "device": {
+      "identifiers": [ "liveenergy_oakridge" ],
+      "manufacturer": "Nick Randell",
+      "model": "Live energy usage"
+    },
+    "icon": "mdi:money",
+    "json_attributes_topic": "nick/sensor/energy/state",
+    "unique_id": "Live_Energy_Last_Cost",
+    "name": "Energy Last Cost",
+    "state_topic": "nick/sensor/energy/state",
+    "unit_of_measurement": "p",
+    "value_template": "{{ value_json.lastCost }}"
+  },
+  "sensor/liveenergy_oakridge/yesterdayCost": {
+    "device": {
+      "identifiers": [ "liveenergy_oakridge" ],
+      "manufacturer": "Nick Randell",
+      "model": "Live energy usage"
+    },
+    "icon": "mdi:money",
+    "unique_id": "Live_Energy_Yesterday_Cost",
+    "name": "Energy Yesterday Cost",
+    "state_topic": "nick/sensor/energy/state",
+    "unit_of_measurement": "p",
+    "value_template": "{{ value_json.yesterdayCost }}"
+  }
+}

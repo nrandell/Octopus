@@ -20,9 +20,16 @@ type DayInformation = {
     Cheapest3Hours: TimeCost
 }
 
-let getDayTarrifs (day: LocalDate) = asyncSeq {
-    let firstCandidate = LocalTime(6, 0, 0)
-    let lastCandidate = LocalTime(21, 0, 0)
+let getDayTarrifs (local: LocalDateTime) = asyncSeq {
+    let startHour = if local.Hour < 6 || local.Hour > 20 then 6 else local.Hour
+    let day = 
+        if local.Hour > 20 then
+            local.Date.PlusDays 1
+        else
+            local.Date
+
+    let firstCandidate = LocalTime(startHour, 0, 0)
+    let lastCandidate = LocalTime(22, 30, 0)
     let mutable time = firstCandidate
     while time <= lastCandidate do
         let todayTime = LocalDateTime(day.Year, day.Month, day.Day, time.Hour, time.Minute, time.Second)
@@ -32,9 +39,11 @@ let getDayTarrifs (day: LocalDate) = asyncSeq {
         time <- time.PlusMinutes 30L
 }
 
-let buildDayInformation (day: LocalDate) = async {
+let buildDayInformation (utcTimestamp: Instant) = async {
+    let local = utcTimestamp.InUtc().LocalDateTime
+    let day = local.Date
     let! candidateTimes = 
-        getDayTarrifs day
+        getDayTarrifs local
         |> AsyncSeq.toListAsync 
 
     let findCheapest (periods: seq<LocalTime*float<pence/kWh>>) =
@@ -109,7 +118,7 @@ let processor =
                     match state with
                     | Empty -> 
                         async {
-                            let! today = buildDayInformation day
+                            let! today = buildDayInformation msg.UtcTimestamp
                             return {
                                 Today = today
                                 YesterdayCost = 0.0<pence>
@@ -139,17 +148,18 @@ let processor =
                             let periodUsed = float (msg.WattHoursDelivered - total.CurrentPeriod.Start) * 1.0<wh>
                             let periodKwh = wattHoursToKilowattHours periodUsed
                             let periodCost = periodKwh * total.CurrentPeriod.Price
-                            let! today = async {
-                                if total.Today.Day = day then
-                                    return total.Today
+                            let! today = buildDayInformation msg.UtcTimestamp
+                            let todayCost, yesterdayCost =
+                                let newCost = (total.CurrentDayCost + periodCost)
+                                if day = total.Today.Day then
+                                    newCost, total.YesterdayCost
                                 else
-                                    return! buildDayInformation day
-                            }
+                                    0.0<pence>, newCost
 
                             return {
                                 Today = today
-                                YesterdayCost = total.CurrentDayCost + periodCost
-                                CurrentDayCost = 0.0<pence>
+                                YesterdayCost = yesterdayCost
+                                CurrentDayCost = todayCost
                                 LastCost = cost
                                 LastUsed = usedKwh
                                 CurrentPeriod = 
