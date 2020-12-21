@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Nick.Energy.Models.CS\Nick.Energy.Models.CS.csproj" />
+    <ProjectReference Include="..\Nick.Energy.Models.CS\Nick.Energy.Models.CS.csproj" />
   </ItemGroup>
 
 </Project>
