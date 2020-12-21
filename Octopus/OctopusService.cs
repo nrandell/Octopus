@@ -9,6 +9,8 @@ using System.Threading;
 
 using Microsoft.Extensions.Options;
 
+using Nick.Energy.Models;
+
 using NodaTime;
 using NodaTime.Text;
 

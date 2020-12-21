@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using Nick.Energy.Models;
+
 using NodaTime;
 
 using System;

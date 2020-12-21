@@ -95,7 +95,7 @@ let processor =
         let rec loop state =
             async {
                 let! message = inbox.Receive()
-                printfn $"Received on {message.Topic}"
+                //printfn $"Received on {message.Topic}"
                 let msg = MqttProcessing.deserialize<HildebrandProcessedMessage> message
                 let period = Tariffs.createTimePeriod msg.UtcTimestamp
                 let day = msg.UtcTimestamp.InUtc().LocalDateTime.Date
@@ -163,7 +163,7 @@ let processor =
                         
 
                 let state' = Previous(msg,total')
-                printfn $"{msg.UtcTimestamp}: {unitPrice} {total'.CurrentDayCost} {total'.LastCost} {total'.LastUsed} {total'.Today}"
+                //printfn $"{msg.UtcTimestamp}: {unitPrice} {total'.CurrentDayCost} {total'.LastCost} {total'.LastUsed} {total'.Today}"
 
                 let publish : MqttProcessing.PublishedMessage = 
                     let today = total'.Today
