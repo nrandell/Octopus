@@ -6,6 +6,7 @@ open NodaTime
 open Nick.Energy.Models
 open FSharp.Control
 
+let roundForDashboard (v:float<pence>) = Math.Round((float)v, 2) * 1.0<pence>
 
 type TimeCost = {
     Start: LocalTime
@@ -183,9 +184,9 @@ let processor =
                         Cheapest1Hour = today.CheapestHour.Start
                         Cheapest2Hours = today.Cheapest2Hours.Start
                         Cheapest3Hours = today.Cheapest3Hours.Start
-                        TodayCost = total'.CurrentDayCost
-                        YesterdayCost = total'.YesterdayCost
-                        LastCost = total'.LastCost
+                        TodayCost =  roundForDashboard total'.CurrentDayCost
+                        YesterdayCost = roundForDashboard total'.YesterdayCost
+                        LastCost = roundForDashboard total'.LastCost
                     }
                 do! MqttProcessing.publish publish
 
