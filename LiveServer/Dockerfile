@@ -24,4 +24,6 @@ FROM mcr.microsoft.com/dotnet/runtime:5.0.1 as final
 WORKDIR /app
 COPY --from=publish /publish .
 
-ENTRYPOINT ["dotnet", "LiveServer.dll"]
+WORKDIR /app/data
+
+ENTRYPOINT ["dotnet", "/app/LiveServer.dll"]

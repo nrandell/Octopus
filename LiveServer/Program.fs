@@ -5,6 +5,21 @@ open MQTTnet
 open NodaTime
 open Nick.Energy.Models
 open FSharp.Control
+open System.IO
+open System.Text.Json
+open System.Text.Json.Serialization
+open NodaTime.Serialization.SystemTextJson
+
+let options =
+    let o = JsonSerializerOptions()
+    o.Converters.Add(JsonFSharpConverter())
+    o.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb) |> ignore
+    o
+
+let serializeAsync (s:Stream) v ct = JsonSerializer.SerializeAsync(s, v, options, ct) |> Async.AwaitTask
+
+let deserializeAsync<'T> (s:Stream) ct = JsonSerializer.DeserializeAsync<'T>(s, options, ct).AsTask() |> Async.AwaitTask
+
 
 let roundForDashboard (v:float<pence>) = Math.Round((float)v, 2) * 1.0<pence>
 
@@ -95,12 +110,60 @@ type Total = {
 }
     
 
-type state = 
+type State = 
     | Empty
     | Previous of HildebrandProcessedMessage*Total
 
 
-let processor = 
+let stateFileName = "state.json"
+
+let private tidyState (stateFile: string) =
+    let partialFile = stateFile + ".pt"
+    let oldFile = stateFile + ".old"
+    if File.Exists partialFile then File.Delete partialFile
+    match File.Exists oldFile, File.Exists stateFile with
+    | true, true ->
+        File.Delete stateFile
+        File.Move(oldFile, stateFile)
+    | true, false ->
+        File.Delete stateFile
+    | false, _ -> ()
+
+
+
+let saveJson fileName value = async {
+    let! ct = Async.CancellationToken
+    use stream = File.Create fileName
+    do! serializeAsync stream value ct
+}
+
+let saveState (stateFile: string) (state: State) = async {
+    tidyState stateFile
+
+
+    let partialFile = stateFile + ".pt"
+    let oldFile = stateFile + ".old"
+    do! saveJson partialFile state 
+
+    if File.Exists stateFile then File.Move(stateFile, oldFile)
+    File.Move(partialFile, stateFile)
+}
+
+let loadState (stateFile: string) = async {
+    tidyState stateFile
+    let! ct = Async.CancellationToken
+
+    if File.Exists stateFile then
+        use stream = File.OpenRead stateFile
+        let! state = deserializeAsync<State> stream ct
+        return state
+    else
+        let state = Empty
+        return state
+}
+
+
+let createProcessor (initialState: State) = 
     MailboxProcessor<MqttApplicationMessage>.Start(fun inbox -> 
         let rec loop state =
             async {
@@ -190,10 +253,10 @@ let processor =
                     }
                 do! MqttProcessing.publish publish
 
-
+                do! saveState stateFileName state'
                 do! loop state'
             }
-        loop Empty
+        loop initialState
     )
 
 let delay() = async {
@@ -211,9 +274,12 @@ let main argv =
     )
 
     let run x = Async.RunSynchronously(x, cancellationToken = cts.Token)
-    processor.Error.Add(fun e -> printfn $"Error: {e}")
     try
         async {
+            let! state = loadState stateFileName
+            let processor = createProcessor state
+            processor.Error.Add(fun e -> printfn $"Error: {e}")
+
             do! MqttProcessing.start processor
             do! delay()
         }
